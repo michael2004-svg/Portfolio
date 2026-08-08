@@ -54,7 +54,7 @@ export default function ContactSection() {
           transition={{ duration: 0.7 }}
         >
           <span className="font-mono text-xs uppercase tracking-[0.25em] text-violet-300">
-            Let's Talk
+            Let&apos;s Talk
           </span>
           <h2 className="mt-4 font-display text-5xl text-ice md:text-6xl">
             Ready to build something people trust?

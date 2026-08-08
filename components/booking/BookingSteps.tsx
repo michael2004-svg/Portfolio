@@ -50,7 +50,7 @@ export function StepProjectType({
   return (
     <div className={fieldShell}>
       <h3 className={heading}>What are we building?</h3>
-      <p className={sub}>Pick the closest match — we'll refine scope on the call.</p>
+      <p className={sub}>Pick the closest match — we&apos;ll refine scope on the call.</p>
       <div className="grid grid-cols-2 gap-3">
         {PROJECT_TYPES.map((t) => (
           <OptionCard
@@ -82,7 +82,7 @@ export function StepBudget({
 }) {
   return (
     <div className={fieldShell}>
-      <h3 className={heading}>What's the budget range?</h3>
+      <h3 className={heading}>What&apos;s the budget range?</h3>
       <p className={sub}>Ballpark is fine — this just shapes the proposal.</p>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {BUDGET_OPTIONS.map((b) => (
@@ -229,8 +229,8 @@ export function StepSummary({
 }) {
   return (
     <div className={fieldShell}>
-      <h3 className={heading}>Here's the estimate.</h3>
-      <p className={sub}>This is a starting point — we'll firm it up on a call.</p>
+      <h3 className={heading}>Here&apos;s the estimate.</h3>
+      <p className={sub}>This is a starting point — we&apos;ll firm it up on a call.</p>
 
       <div className="grid grid-cols-2 gap-4">
         <motion.div

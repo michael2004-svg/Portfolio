@@ -62,7 +62,7 @@ export default function TestimonialsSection() {
               >
                 <Stars rating={active.rating} />
                 <blockquote className="mt-5 font-display text-2xl leading-snug text-ice md:text-3xl">
-                  "{active.quote}"
+                  &quot;{active.quote}&quot;
                 </blockquote>
                 <div className="mt-6 flex items-center gap-3">
                   <div>

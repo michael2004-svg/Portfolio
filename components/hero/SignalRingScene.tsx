@@ -37,7 +37,9 @@ function SignalRing() {
       {bars.map(({ angle }, i) => (
         <mesh
           key={i}
-          ref={(el) => el && (barsRef.current[i] = el)}
+          ref={(el) => {
+            if (el) barsRef.current[i] = el;
+          }}
           position={[Math.cos(angle) * 2.4, Math.sin(angle) * 2.4, 0]}
           rotation={[0, 0, angle + Math.PI / 2]}
         >

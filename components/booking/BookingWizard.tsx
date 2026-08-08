@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import MagneticButton from "@/components/ui/MagneticButton";
 import { BookingData, initialBookingData } from "./booking-types";
-import { computeEstimate } from "./estimate";
+import { computeEstimate, Estimate } from "./estimate";
 import {
   StepProjectType,
   StepBudget,
@@ -26,10 +26,9 @@ const STEPS = [
   "summary",
 ] as const;
 
-// add near the top of BookingWizard.tsx
-const WHATSAPP_NUMBER = "254700000000"; // ⚠️ same placeholder as ContactSection — keep in sync, or move to a shared config file
+const WHATSAPP_NUMBER = "254700000000"; // ⚠️ placeholder — replace with your real number, keep in sync with ContactSection.tsx
 
-function buildWhatsAppMessage(data: BookingData, estimate: ReturnType<typeof computeEstimate>) {
+function buildWhatsAppMessage(data: BookingData, estimate: Estimate) {
   const lines = [
     `New project inquiry`,
     `Type: ${data.projectType ?? "—"}`,
@@ -44,17 +43,6 @@ function buildWhatsAppMessage(data: BookingData, estimate: ReturnType<typeof com
   return encodeURIComponent(lines.join("\n"));
 }
 
-// replace the final "Send to Michael" button's onClick:
-<MagneticButton
-  variant="primary"
-  onClick={() => {
-    const msg = buildWhatsAppMessage(data, estimate);
-    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, "_blank");
-    onClose();
-  }}
->
-  Send to Michael
-</MagneticButton>
 export default function BookingWizard({
   preselectTier,
   onClose,
@@ -67,7 +55,6 @@ export default function BookingWizard({
     ...initialBookingData,
     tierPreselect: preselectTier,
   });
-  const [submitted, setSubmitted] = useState(false);
 
   const step = STEPS[stepIndex];
   const isLast = stepIndex === STEPS.length - 2; // uploads is last input step
@@ -82,11 +69,14 @@ export default function BookingWizard({
     return true;
   };
 
-  const next = () => {
-    if (isLast) setSubmitted(true);
-    setStepIndex((i) => Math.min(i + 1, STEPS.length - 1));
-  };
+  const next = () => setStepIndex((i) => Math.min(i + 1, STEPS.length - 1));
   const back = () => setStepIndex((i) => Math.max(i - 1, 0));
+
+  const handleSend = () => {
+    const msg = buildWhatsAppMessage(data, estimate);
+    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, "_blank");
+    onClose();
+  };
 
   return (
     <motion.div
@@ -164,7 +154,7 @@ export default function BookingWizard({
               {isLast ? "Get Estimate" : "Continue"}
             </MagneticButton>
           ) : (
-            <MagneticButton variant="primary" onClick={onClose}>
+            <MagneticButton variant="primary" onClick={handleSend}>
               Send to Michael
             </MagneticButton>
           )}

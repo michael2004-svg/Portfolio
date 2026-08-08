@@ -21,7 +21,11 @@ const item = {
   show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } },
 };
 
-export default function Hero() {
+export default function Hero({
+  onBookProject,
+}: {
+  onBookProject: () => void;
+}) {
   return (
     <section className="relative min-h-screen w-full flex items-center overflow-hidden bg-bg">
       <AuroraBackground />
@@ -54,7 +58,9 @@ export default function Hero() {
           </motion.p>
 
           <motion.div variants={item} className="mt-10 flex flex-wrap gap-4">
-            <MagneticButton variant="primary">Book Your Project</MagneticButton>
+            <MagneticButton variant="primary" onClick={onBookProject}>
+              Book Your Project
+            </MagneticButton>
             <MagneticButton variant="ghost">View My Work</MagneticButton>
           </motion.div>
         </motion.div>

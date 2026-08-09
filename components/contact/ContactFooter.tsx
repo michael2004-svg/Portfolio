@@ -6,7 +6,7 @@ export default function ContactFooter({ onBookProject }: { onBookProject: () => 
   return (
     <footer className="w-full bg-bg-elevated py-16">
       <div className="mx-auto max-w-5xl px-6 text-center md:px-12">
-        <h2 className="font-display text-3xl text-ice sm:text-4xl">Let's Build Something Great</h2>
+        <h2 className="font-display text-3xl text-ice sm:text-4xl">Let&apos;s Build Something Great</h2>
         <p className="mt-3 font-body text-muted">Ready to take your idea to the next level?</p>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-4">

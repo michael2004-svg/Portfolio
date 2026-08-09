@@ -57,7 +57,7 @@ export default function ReviewsSection() {
               className="rounded-2xl glass p-6"
             >
               <Stars rating={r.rating} />
-              <p className="mt-4 font-body text-base text-ice/90">"{r.quote}"</p>
+              <p className="mt-4 font-body text-base text-ice/90">&quot;{r.quote}&quot;</p>
               <div className="mt-4">
                 <div className="font-body text-sm font-medium text-ice">{r.name}</div>
                 <div className="font-mono text-xs text-muted">{r.role}</div>

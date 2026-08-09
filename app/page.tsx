@@ -2,14 +2,14 @@
 
 import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
+import Navbar from "@/components/nav/Navbar";
 import Hero from "@/components/hero/Hero";
 import ProjectsSection from "@/components/projects/ProjectsSection";
-import ProofSection from "@/components/proof/ProofSection";
-import TestimonialsSection from "@/components/testimonials/TestimonialsSection";
+import ReviewsSection from "@/components/reviews/ReviewsSection";
+import GuaranteesSection from "@/components/guarantees/GuaranteesSection";
 import PricingSection from "@/components/pricing/PricingSection";
 import BookingWizard from "@/components/booking/BookingWizard";
-import NewsletterSection from "@/components/contact/NewsletterSection";
-import ContactSection from "@/components/contact/ContactSection";
+import ContactFooter from "@/components/contact/ContactFooter";
 
 export default function Home() {
   const [bookingTier, setBookingTier] = useState<string | null>(null);
@@ -22,20 +22,15 @@ export default function Home() {
 
   return (
     <main>
+      <Navbar onBookProject={() => openWizard(null)} />
       <Hero onBookProject={() => openWizard(null)} />
       <ProjectsSection />
-      <ProofSection />
-      <TestimonialsSection />
+      <ReviewsSection />
+      <GuaranteesSection />
       <PricingSection onBook={openWizard} />
-      <NewsletterSection />
-      <ContactSection />
+      <ContactFooter onBookProject={() => openWizard(null)} />
       <AnimatePresence>
-        {wizardOpen && (
-          <BookingWizard
-            preselectTier={bookingTier}
-            onClose={() => setWizardOpen(false)}
-          />
-        )}
+        {wizardOpen && <BookingWizard preselectTier={bookingTier} onClose={() => setWizardOpen(false)} />}
       </AnimatePresence>
     </main>
   );

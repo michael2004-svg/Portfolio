@@ -22,18 +22,13 @@ const jetbrains = localFont({
 
 export const metadata: Metadata = {
   title: "Michael Musyoka — Software Engineer",
-  description:
-    "Full-stack engineer building premium web, mobile, and systems products.",
+  description: "Full-stack engineer building premium web, mobile, and systems products.",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${clash.variable} ${general.variable} ${jetbrains.variable}`}>
-      <body className="noise antialiased">{children}</body>
+      <body className="antialiased">{children}</body>
     </html>
   );
 }

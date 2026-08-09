@@ -1,83 +1,54 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
-import AuroraBackground from "./AuroraBackground";
-import MagneticButton from "@/components/ui/MagneticButton";
+import VideoCard from "./VideoCard";
+import TrustRow from "./TrustRow";
+import Button from "@/components/ui/Button";
 
-const SignalRingScene = dynamic(() => import("./SignalRingScene"), {
-  ssr: false,
-});
-
-const container = {
-  hidden: {},
-  show: {
-    transition: { staggerChildren: 0.12, delayChildren: 0.2 },
-  },
-};
-
-const item = {
-  hidden: { opacity: 0, y: 24 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } },
-};
-
-export default function Hero({
-  onBookProject,
-}: {
-  onBookProject: () => void;
-}) {
+export default function Hero({ onBookProject }: { onBookProject: () => void }) {
   return (
-    <section className="relative min-h-screen w-full flex items-center overflow-hidden bg-bg">
-      <AuroraBackground />
+    <section id="home" className="relative w-full bg-bg pb-16 pt-28 md:pb-24 md:pt-32">
+      <div className="mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-10 px-6 md:grid-cols-[55%_45%] md:gap-12 md:px-12">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <span className="inline-block rounded-full glass px-4 py-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-violet-300">
+            I Build Digital Solutions
+          </span>
 
-      <div className="relative z-10 mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-12 px-6 py-32 md:grid-cols-[55%_45%] md:px-12">
-        <motion.div variants={container} initial="hidden" animate="show">
-          <motion.span
-            variants={item}
-            className="inline-block font-mono text-xs uppercase tracking-[0.25em] text-violet-300"
-          >
-            Software Engineer — Nairobi
-          </motion.span>
+          <h1 className="mt-6 font-display text-4xl leading-tight text-ice sm:text-5xl md:text-5xl">
+            Websites, Apps &amp; Systems That Drive{" "}
+            <span className="text-violet-300">Real Results.</span>
+          </h1>
 
-          <motion.h1
-            variants={item}
-            className="mt-6 font-display text-[13vw] leading-[0.95] text-ice md:text-[5.5vw]"
-          >
-            I build products
-            <br />
-            people <span className="text-violet-300">trust</span>.
-          </motion.h1>
+          <p className="mt-5 max-w-md font-body text-base text-muted sm:text-lg">
+            High-performance digital products built to scale your business —
+            not just look good in a portfolio.
+          </p>
 
-          <motion.p
-            variants={item}
-            className="mt-6 max-w-md font-body text-lg text-muted"
-          >
-            Full-stack engineer crafting web apps, mobile apps, and systems
-            with the same care I bring to producing a track — every detail
-            considered, nothing left generic.
-          </motion.p>
+          <div className="mt-8 flex flex-wrap items-center gap-6">
+            <Button onClick={onBookProject}>Book the Service</Button>
+            <a
+              href="#projects"
+              className="font-body text-sm text-ice underline decoration-violet-300/40 underline-offset-4 hover:text-violet-300"
+            >
+              View My Work
+            </a>
+          </div>
 
-          <motion.div variants={item} className="mt-10 flex flex-wrap gap-4">
-            <MagneticButton variant="primary" onClick={onBookProject}>
-              Book Your Project
-            </MagneticButton>
-            <MagneticButton variant="ghost">View My Work</MagneticButton>
-          </motion.div>
+          <TrustRow />
         </motion.div>
 
-        <div className="relative h-[420px] w-full md:h-[560px]">
-          <SignalRingScene />
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+        >
+          <VideoCard />
+        </motion.div>
       </div>
-
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.4, duration: 1 }}
-        className="absolute bottom-10 left-1/2 -translate-x-1/2 font-mono text-[11px] uppercase tracking-[0.3em] text-muted"
-      >
-        Scroll
-      </motion.div>
     </section>
   );
 }

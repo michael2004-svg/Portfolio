@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import MagneticButton from "@/components/ui/MagneticButton";
+import Button from "@/components/ui/Button";
 import { BookingData, initialBookingData } from "./booking-types";
 import { computeEstimate, Estimate } from "./estimate";
 import {
@@ -16,17 +16,8 @@ import {
   StepSummary,
 } from "./BookingSteps";
 
-const STEPS = [
-  "type",
-  "budget",
-  "deadline",
-  "features",
-  "inspiration",
-  "uploads",
-  "summary",
-] as const;
-
-const WHATSAPP_NUMBER = "254700000000"; // ⚠️ placeholder — replace with your real number, keep in sync with ContactSection.tsx
+const STEPS = ["type", "budget", "deadline", "features", "inspiration", "uploads", "summary"] as const;
+const WHATSAPP_NUMBER = "254700000000"; // ⚠️ placeholder — replace with your real number
 
 function buildWhatsAppMessage(data: BookingData, estimate: Estimate) {
   const lines = [
@@ -43,23 +34,13 @@ function buildWhatsAppMessage(data: BookingData, estimate: Estimate) {
   return encodeURIComponent(lines.join("\n"));
 }
 
-export default function BookingWizard({
-  preselectTier,
-  onClose,
-}: {
-  preselectTier: string | null;
-  onClose: () => void;
-}) {
+export default function BookingWizard({ preselectTier, onClose }: { preselectTier: string | null; onClose: () => void }) {
   const [stepIndex, setStepIndex] = useState(0);
-  const [data, setData] = useState<BookingData>({
-    ...initialBookingData,
-    tierPreselect: preselectTier,
-  });
+  const [data, setData] = useState<BookingData>({ ...initialBookingData, tierPreselect: preselectTier });
 
   const step = STEPS[stepIndex];
-  const isLast = stepIndex === STEPS.length - 2; // uploads is last input step
+  const isLast = stepIndex === STEPS.length - 2;
   const estimate = useMemo(() => computeEstimate(data), [data]);
-
   const update = (patch: Partial<BookingData>) => setData((d) => ({ ...d, ...patch }));
 
   const canAdvance = () => {
@@ -80,49 +61,32 @@ export default function BookingWizard({
 
   return (
     <motion.div
-      className="fixed inset-0 z-[300] flex items-center justify-center bg-bg/90 p-4 backdrop-blur-xl"
+      className="fixed inset-0 z-[300] flex items-center justify-center bg-bg/90 p-4 backdrop-blur-lg"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       onClick={onClose}
     >
       <motion.div
-        initial={{ opacity: 0, y: 30, scale: 0.96 }}
+        initial={{ opacity: 0, y: 20, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: 30, scale: 0.96 }}
-        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+        exit={{ opacity: 0, y: 20, scale: 0.98 }}
+        transition={{ duration: 0.25 }}
         onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-xl overflow-hidden rounded-3xl glass p-8 md:p-10"
+        className="relative max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-2xl glass p-6 sm:p-10"
       >
-        <button
-          onClick={onClose}
-          aria-label="Close booking wizard"
-          className="absolute right-6 top-6 font-mono text-muted hover:text-violet-300"
-        >
+        <button onClick={onClose} aria-label="Close booking wizard" className="absolute right-5 top-5 font-mono text-muted hover:text-violet-300">
           ✕
         </button>
 
-        {/* progress bar */}
         <div className="mb-8 flex gap-1.5">
           {STEPS.slice(0, -1).map((s, i) => (
-            <div
-              key={s}
-              className={cn(
-                "h-1 flex-1 rounded-full transition-colors",
-                i <= stepIndex ? "bg-violet-300" : "bg-white/10"
-              )}
-            />
+            <div key={s} className={cn("h-1 flex-1 rounded-full", i <= stepIndex ? "bg-violet-300" : "bg-white/10")} />
           ))}
         </div>
 
         <AnimatePresence mode="wait">
-          <motion.div
-            key={step}
-            initial={{ opacity: 0, x: 24 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -24 }}
-            transition={{ duration: 0.35 }}
-          >
+          <motion.div key={step} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
             {step === "type" && <StepProjectType data={data} update={update} />}
             {step === "budget" && <StepBudget data={data} update={update} />}
             {step === "deadline" && <StepDeadline data={data} update={update} />}
@@ -135,28 +99,17 @@ export default function BookingWizard({
 
         <div className="mt-8 flex items-center justify-between">
           {stepIndex > 0 && stepIndex < STEPS.length - 1 ? (
-            <button
-              onClick={back}
-              className="font-mono text-xs text-muted hover:text-ice"
-            >
-              ← Back
-            </button>
+            <button onClick={back} className="font-mono text-xs text-muted hover:text-ice">← Back</button>
           ) : (
             <span />
           )}
 
           {step !== "summary" ? (
-            <MagneticButton
-              variant="primary"
-              onClick={next}
-              className={cn(!canAdvance() && "pointer-events-none opacity-40")}
-            >
+            <Button onClick={next} className={cn(!canAdvance() && "pointer-events-none opacity-40")}>
               {isLast ? "Get Estimate" : "Continue"}
-            </MagneticButton>
+            </Button>
           ) : (
-            <MagneticButton variant="primary" onClick={handleSend}>
-              Send to Michael
-            </MagneticButton>
+            <Button onClick={handleSend}>Send to Michael</Button>
           )}
         </div>
       </motion.div>

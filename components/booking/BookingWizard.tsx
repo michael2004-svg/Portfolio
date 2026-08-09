@@ -17,7 +17,7 @@ import {
 } from "./BookingSteps";
 
 const STEPS = ["type", "budget", "deadline", "features", "inspiration", "uploads", "summary"] as const;
-const WHATSAPP_NUMBER = "254700000000"; // ⚠️ placeholder — replace with your real number
+const WHATSAPP_NUMBER = "254759309920"; // ⚠️ placeholder — replace with your real number
 
 function buildWhatsAppMessage(data: BookingData, estimate: Estimate) {
   const lines = [

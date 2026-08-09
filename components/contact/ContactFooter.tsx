@@ -1,6 +1,6 @@
 "use client";
 
-const WHATSAPP_NUMBER = "254700000000"; // ⚠️ same placeholder — keep in sync with BookingWizard.tsx
+const WHATSAPP_NUMBER = "254759309920"; // ⚠️ same placeholder — keep in sync with BookingWizard.tsx
 
 export default function ContactFooter({ onBookProject }: { onBookProject: () => void }) {
   return (

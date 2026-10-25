@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import VideoCard from "./VideoCard";
+import ShowcaseCard from "./ShowcaseCard";
 import TrustRow from "./TrustRow";
 import Button from "@/components/ui/Button";
 
@@ -29,9 +29,10 @@ export default function Hero({ onBookProject }: { onBookProject: () => void }) {
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-6">
-            <Button onClick={onBookProject}>Book the Service</Button>
+            <Button onClick={onBookProject} track="hero_book">Book the Service</Button>
             <a
               href="#projects"
+              data-track="hero_view_work"
               className="font-body text-sm text-ice underline decoration-violet-300/40 underline-offset-4 hover:text-violet-300"
             >
               View My Work
@@ -46,7 +47,7 @@ export default function Hero({ onBookProject }: { onBookProject: () => void }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
         >
-          <VideoCard />
+          <ShowcaseCard />
         </motion.div>
       </div>
     </section>

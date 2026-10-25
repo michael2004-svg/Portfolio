@@ -6,7 +6,7 @@ export type ProjectType =
   | "saas"
   | "enterprise";
 
-export type BudgetRange = "under-500" | "500-2000" | "2000-6000" | "6000-plus" | "not-sure";
+export type BudgetRange = "under-150k" | "150k-400k" | "400k-1m" | "1m-plus" | "not-sure";
 export type Deadline = "asap" | "1-month" | "1-3-months" | "flexible";
 
 export type BookingData = {
@@ -17,6 +17,9 @@ export type BookingData = {
   features: string[];
   inspiration: string;
   fileNames: string[];
+  name: string;
+  email: string;
+  phone: string;
 };
 
 export const initialBookingData: BookingData = {
@@ -27,6 +30,9 @@ export const initialBookingData: BookingData = {
   features: [],
   inspiration: "",
   fileNames: [],
+  name: "",
+  email: "",
+  phone: "",
 };
 
 export const PROJECT_TYPES: { id: ProjectType; label: string; weight: number }[] = [

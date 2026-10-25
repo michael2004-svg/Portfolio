@@ -1,0 +1,70 @@
+# Portfolio (michaelmusyoka.com) + booking site (booking.michaelmusyoka.com) + admin + client portal.
+# First-time setup / manual redeploy: bash scripts/setup.sh
+# Pushes to main deploy through .github/workflows/deploy.yml (infrastructure reusable workflow).
+# Caddy reaches the app at portfolio:3000 over the shared `proxy` network.
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner
+      args:
+        NEXT_PUBLIC_PORTFOLIO_URL: ${NEXT_PUBLIC_PORTFOLIO_URL:-https://michaelmusyoka.com}
+    image: portfolio:${IMAGE_TAG:?IMAGE_TAG is required}
+    restart: unless-stopped
+    env_file: .env
+    expose:
+      - "3000"
+    volumes:
+      - uploads:/app/uploads
+    networks:
+      proxy:
+        aliases:
+          - portfolio
+      db: {}
+
+  # One-off migration runner — never started by `up` (setup.sh runs it).
+  migrate:
+    profiles: ["tools"]
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: migrator
+    image: portfolio-migrate:${IMAGE_TAG:?IMAGE_TAG is required}
+    env_file: .env
+    networks:
+      - db
+
+  # Fallback database, only used when setup.sh finds no shared PostgreSQL on the VPS.
+  postgres:
+    profiles: ["localdb"]
+    image: postgres:16-alpine
+    container_name: portfolio-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${LOCALDB_SUPERUSER_PASSWORD:-unused}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks:
+      - db
+
+volumes:
+  uploads:
+    name: portfolio_uploads
+  pgdata:
+    name: portfolio_pgdata
+
+networks:
+  proxy:
+    external: true
+  # The Docker network the PostgreSQL container is on (detected and saved to .env by setup.sh).
+  db:
+    external: true
+    name: ${DB_NETWORK:-backend}

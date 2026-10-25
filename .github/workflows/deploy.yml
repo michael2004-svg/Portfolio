@@ -1,0 +1,27 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+    inputs:
+      commit_sha:
+        description: "Commit SHA to deploy (leave empty for current main)"
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    uses: michael2004-svg/infrastructure/.github/workflows/reusable-docker-deploy.yml@v1
+    with:
+      app_dir: /opt/deploy/applications/portfolio
+      app_service: web
+      compose_file: compose.yml
+      health_timeout: 180
+      commit_sha: ${{ inputs.commit_sha }}
+    secrets: inherit

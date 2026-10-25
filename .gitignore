@@ -34,3 +34,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# app
+.env
+/uploads
+backups/
+.deployed_sha
+.previous_sha

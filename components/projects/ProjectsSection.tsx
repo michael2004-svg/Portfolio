@@ -22,8 +22,9 @@ export default function ProjectsSection() {
         >
           <span className="font-mono text-xs uppercase tracking-[0.25em] text-violet-300">Selected Work</span>
           <h2 className="mt-4 font-display text-3xl text-ice sm:text-4xl md:text-5xl">
-            Six products. Six different problems.
+            Real products, actually live.
           </h2>
+          <p className="mt-4 font-body text-muted">Not mockups — software running in production today. Tap any card for the case study.</p>
         </motion.div>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">

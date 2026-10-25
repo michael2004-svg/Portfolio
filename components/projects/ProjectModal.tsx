@@ -1,8 +1,10 @@
 "use client";
 
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Project } from "./projects-data";
+import { StatusPill } from "./ProjectCard";
 
 export default function ProjectModal({
   project,
@@ -30,6 +32,15 @@ export default function ProjectModal({
             className="mx-auto my-10 w-full max-w-3xl overflow-hidden rounded-2xl glass"
           >
             <div className={cn("relative h-48 w-full bg-gradient-to-br sm:h-64", project.gradient)}>
+              {project.image && (
+                <>
+                  <Image src={project.image} alt={project.title} fill sizes="768px" className="object-cover object-top" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/50 to-transparent" />
+                </>
+              )}
+              <div className="absolute left-4 top-4">
+                <StatusPill status={project.status} />
+              </div>
               <button
                 onClick={onClose}
                 aria-label="Close case study"

@@ -26,10 +26,10 @@ export function computeEstimate(data: BookingData): Estimate {
   };
 
   const budgetMap: Record<Estimate["complexity"], string> = {
-    Simple: "$300 – $800",
-    Moderate: "$800 – $2,500",
-    Complex: "$2,500 – $6,000",
-    "Enterprise-scale": "$6,000+",
+    Simple: "KES 80,000 – 150,000",
+    Moderate: "KES 150,000 – 400,000",
+    Complex: "KES 400,000 – 1,000,000",
+    "Enterprise-scale": "KES 1,000,000+",
   };
 
   const deadlineNote =

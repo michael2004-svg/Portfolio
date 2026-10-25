@@ -8,7 +8,8 @@ import Button from "@/components/ui/Button";
 const NAV_LINKS = [
   { label: "Home", href: "#home" },
   { label: "Projects", href: "#projects" },
-  { label: "Reviews", href: "#reviews" },
+  { label: "Track Record", href: "#reviews" },
+  { label: "Process", href: "#process" },
   { label: "Guarantees", href: "#guarantees" },
   { label: "Pricing", href: "#pricing" },
 ];
@@ -47,7 +48,7 @@ export default function Navbar({ onBookProject }: { onBookProject: () => void })
           ))}
         </nav>
 
-        <Button onClick={onBookProject} className="hidden lg:inline-block">
+        <Button onClick={onBookProject} track="nav_book" className="hidden lg:inline-block">
           Book the Service
         </Button>
 
@@ -83,6 +84,7 @@ export default function Navbar({ onBookProject }: { onBookProject: () => void })
                 </a>
               ))}
               <Button
+                track="nav_book_mobile"
                 onClick={() => {
                   setMobileOpen(false);
                   onBookProject();

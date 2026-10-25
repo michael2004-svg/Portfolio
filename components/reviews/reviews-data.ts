@@ -1,24 +1,33 @@
-// ⚠️ PLACEHOLDER — fictional stats and reviews for layout purposes only.
-// Replace every number and quote with real ones before this goes live.
+export const GITHUB_URL = "https://github.com/michael2004-svg";
 
 export const stats = [
-  { label: "Projects delivered", value: "12+" },
-  { label: "Average rating", value: "5.0" },
-  { label: "Client retention", value: "90%" },
-  { label: "Avg. response time", value: "2h" },
+  { label: "Products live", value: "8" },
+  { label: "GitHub contributions / yr", value: "516" },
+  { label: "M-Pesa orders processed", value: "389" },
+  { label: "Features on NearbyRadar", value: "70+" },
 ];
 
-export type Review = {
+export type Proof = {
   id: string;
-  name: string;
-  role: string;
-  quote: string;
-  rating: number;
+  title: string;
+  detail: string;
 };
 
-export const reviews: Review[] = [
-  { id: "r1", name: "Client Name", role: "Founder, Company A", quote: "Placeholder — replace with a real testimonial about the outcome, not just the process.", rating: 5 },
-  { id: "r2", name: "Client Name", role: "Ops Lead, Company B", quote: "Placeholder — ideally something specific: a number, a before/after, a deadline hit.", rating: 5 },
-  { id: "r3", name: "Client Name", role: "PM, Company C", quote: "Placeholder — the strongest testimonials name the specific problem that got solved.", rating: 5 },
-  { id: "r4", name: "Client Name", role: "CEO, Company D", quote: "Placeholder — keep these short in the final version, 1–2 sentences reads stronger.", rating: 5 },
+// No client testimonials published yet — these are checkable facts instead.
+export const proofs: Proof[] = [
+  {
+    id: "nearbyradar",
+    title: "NearbyRadar",
+    detail: "70+ features shipped for discovering nearby shops, schools and services across Kenya.",
+  },
+  {
+    id: "bookverse",
+    title: "Bookverse",
+    detail: "Full edtech platform with over 200 titles, built and maintained end-to-end.",
+  },
+  {
+    id: "vms",
+    title: "Visitor Management System",
+    detail: "Delivered for Kenya Literature Bureau — digital check-in and reporting still running in production.",
+  },
 ];

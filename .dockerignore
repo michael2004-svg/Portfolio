@@ -1,0 +1,16 @@
+node_modules
+.next
+.git
+.github
+.env
+.env.*
+!.env.example
+uploads
+npm-debug.log*
+README.md
+DEPLOY.md
+backups
+.deployed_sha
+.previous_sha
+scripts
+deploy

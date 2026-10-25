@@ -1,0 +1,140 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------- Analytics ----------
+
+model Event {
+  id        String   @id @default(cuid())
+  site      String // "portfolio" | "booking"
+  type      String // "pageview" | "click" | "conversion"
+  name      String? // button id for clicks, conversion kind for conversions
+  path      String
+  visitorId String
+  sessionId String
+  referrer  String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([site, type, createdAt])
+  @@index([visitorId])
+}
+
+// ---------- Leads (booking form submissions) ----------
+
+model Lead {
+  id          String   @id @default(cuid())
+  site        String
+  name        String
+  email       String
+  phone       String?
+  projectType String?
+  budget      String?
+  deadline    String?
+  stage       String?
+  features    String[]
+  details     String?
+  estimate    Json?
+  visitorId   String?
+  status      String   @default("new") // new | contacted | won | lost
+  clientId    String?
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+// ---------- Client portal ----------
+
+model Client {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  company       String?
+  passwordHash  String?
+  inviteToken   String?   @unique
+  inviteExpires DateTime?
+  lastLoginAt   DateTime?
+  createdAt     DateTime  @default(now())
+  projects      Project[]
+}
+
+model Project {
+  id          String          @id @default(cuid())
+  clientId    String
+  client      Client          @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  status      String          @default("planning") // planning | in_progress | review | completed
+  progress    Int             @default(0)
+  startDate   DateTime?
+  dueDate     DateTime?
+  approvedAt  DateTime?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  milestones  Milestone[]
+  updates     ProjectUpdate[]
+  documents   Document[]
+  review      Review?
+}
+
+model Milestone {
+  id          String    @id @default(cuid())
+  projectId   String
+  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  order       Int       @default(0)
+  status      String    @default("pending") // pending | in_progress | awaiting_approval | approved
+  dueDate     DateTime?
+  approvedAt  DateTime?
+  createdAt   DateTime  @default(now())
+}
+
+model ProjectUpdate {
+  id        String   @id @default(cuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  body      String
+  createdAt DateTime @default(now())
+}
+
+model Document {
+  id         String   @id @default(cuid())
+  projectId  String
+  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name       String
+  kind       String   @default("other") // contract | invoice | deliverable | other
+  fileName   String
+  storedName String   @unique
+  mimeType   String
+  size       Int
+  createdAt  DateTime @default(now())
+}
+
+// ---------- Reviews / testimonials ----------
+
+model Review {
+  id              String    @id @default(cuid())
+  projectId       String?   @unique
+  project         Project?  @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  token           String    @unique
+  email           String?
+  name            String
+  role            String?
+  rating          Int?
+  quote           String?
+  status          String    @default("requested") // requested | pending | approved | rejected
+  showOnPortfolio Boolean   @default(true)
+  showOnBooking   Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  submittedAt     DateTime?
+  approvedAt      DateTime?
+
+  @@index([status])
+}

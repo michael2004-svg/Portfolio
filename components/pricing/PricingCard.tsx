@@ -31,10 +31,8 @@ export default function PricingCard({
         </span>
       )}
       <span className="font-mono text-xs uppercase tracking-[0.2em] text-violet-300">{tier.name}</span>
-      <div className="mt-4 flex items-baseline gap-1">
-        <span className="font-display text-3xl text-ice sm:text-4xl">{tier.price}</span>
-        {tier.price !== "Custom" && <span className="font-body text-sm text-muted">starting</span>}
-      </div>
+      <span className="mt-4 font-body text-xs text-muted">From</span>
+      <span className="font-display text-3xl text-ice">{tier.price}</span>
       <p className="mt-1 font-mono text-xs text-muted">{tier.timeline}</p>
       <p className="mt-4 font-body text-sm text-muted">{tier.description}</p>
 
@@ -47,7 +45,7 @@ export default function PricingCard({
         ))}
       </ul>
 
-      <Button variant={tier.featured ? "primary" : "ghost"} onClick={onBook} className="mt-8 w-full">
+      <Button variant={tier.featured ? "primary" : "ghost"} onClick={onBook} track={`pricing_${tier.id}`} className="mt-8 w-full">
         Book This Service
       </Button>
     </motion.div>

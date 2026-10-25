@@ -1,0 +1,15 @@
+# Add to the shared Caddy config (/opt/stacks/proxy), then reload Caddy.
+# Both domains hit the same container; the app picks the site by Host header.
+
+michaelmusyoka.com, www.michaelmusyoka.com {
+	encode zstd gzip
+	request_body {
+		max_size 30MB
+	}
+	reverse_proxy portfolio:3000
+}
+
+booking.michaelmusyoka.com {
+	encode zstd gzip
+	reverse_proxy portfolio:3000
+}

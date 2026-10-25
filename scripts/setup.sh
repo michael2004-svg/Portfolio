@@ -17,13 +17,14 @@ set -Eeuo pipefail
 #      Press Enter to skip any of them. They can also be passed in advance, e.g.
 #      SMTP_HOST=... SMTP_USER=... SMTP_PASS=... bash scripts/setup.sh
 #   4. backs up the database, applies migrations, builds and starts the app and waits until healthy,
-#   5. adds both domains to Caddy for HTTPS.
+#   5. points the domains at this server in Cloudflare DNS (asks once for an API token; Enter to skip),
+#   6. adds both domains to Caddy for HTTPS.
 #
 # The admin login is ADMIN_EMAIL / ADMIN_PASSWORD in .env: edit them and run this script again to change it.
 
 for arg in "$@"; do
   case "${arg}" in
-    -h|--help) sed -n '3,22p' "$0"; exit 0 ;;
+    -h|--help) sed -n '3,23p' "$0"; exit 0 ;;
     *) echo "[error] Unknown option: ${arg} (try --help)" >&2; exit 1 ;;
   esac
 done
@@ -31,6 +32,7 @@ done
 # Values that may be passed to this script (read before .env lookups reuse the names).
 PASSED_BOOKING_DOMAIN="${BOOKING_DOMAIN:-}"
 PASSED_PG_CONTAINER="${PG_CONTAINER:-}"
+PASSED_SERVER_IP="${SERVER_IP:-}"
 
 APP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 COMPOSE_FILE="${APP_DIR}/compose.yml"
@@ -287,6 +289,69 @@ compose up -d --no-deps --force-recreate web
 wait_healthy web
 git rev-parse HEAD > .deployed_sha 2>/dev/null || true
 
+# ── DNS (Cloudflare) ───────────────────────────────────────────────────────────────────────
+# Replaces the A/AAAA/CNAME records of the three hosts (e.g. old Vercel ones) with an A record for
+# this server. Needs an API token with Zone → DNS → Edit for the domain. MX/TXT records are untouched.
+DNS_HOSTS=("${DOMAIN}" "www.${DOMAIN}" "${BOOKING_DOMAIN}")
+SERVER_IP="$(env_get SERVER_IP)"
+if [ -z "${SERVER_IP}" ]; then
+  SERVER_IP="${PASSED_SERVER_IP:-$(curl -4 -fsS --max-time 10 https://api.ipify.org 2>/dev/null || curl -4 -fsS --max-time 10 https://ifconfig.me 2>/dev/null || true)}"
+  [ -n "${SERVER_IP}" ] && env_set SERVER_IP "${SERVER_IP}"
+fi
+[ -n "$(env_get CF_PROXIED)" ] || env_set CF_PROXIED "${CF_PROXIED:-false}"
+ask CLOUDFLARE_API_TOKEN "Cloudflare API token (Zone > DNS > Edit) to point ${DOMAIN} here" secret
+
+DNS_STATUS="not changed"
+CF_TOKEN="$(env_get CLOUDFLARE_API_TOKEN)"
+indent() { printf '%s\n' "$1" | sed 's/^/    /'; }
+cf_dns() {
+  CLOUDFLARE_API_TOKEN="${CF_TOKEN}" python3 "${APP_DIR}/scripts/cloudflare_dns.py" "$1" \
+    --zone "${DOMAIN}" --ip "${SERVER_IP}" --proxied "$(env_get CF_PROXIED)" "${DNS_HOSTS[@]}"
+}
+if [ -z "${CF_TOKEN}" ]; then
+  DNS_STATUS="manual: add A records for ${DNS_HOSTS[*]} -> ${SERVER_IP:-the IP of this server}"
+elif [ -z "${SERVER_IP}" ]; then
+  DNS_STATUS="could not detect this server's public IP; set SERVER_IP in .env and run again"
+elif ! command -v python3 >/dev/null 2>&1; then
+  DNS_STATUS="python3 is not installed (sudo apt install -y python3); DNS not changed"
+else
+  log "Checking Cloudflare DNS for ${DNS_HOSTS[*]}..."
+  plan_rc=0; plan_out="$(cf_dns plan 2>&1)" || plan_rc=$?
+  indent "${plan_out}"
+  apply=0
+  if [ "${plan_rc}" = 0 ]; then
+    grep -q 'will create' <<<"${plan_out}" && apply=1
+    [ "${apply}" = 0 ] && DNS_STATUS="already points at ${SERVER_IP}"
+  elif [ "${plan_rc}" = 3 ]; then
+    # Existing records point elsewhere: replacing them moves live traffic, so confirm first.
+    if [ "${DNS_REPLACE:-}" = "yes" ]; then
+      apply=1
+    elif interactive; then
+      read -r -p "  Replace those records so the sites are served from this server? [y/N]: " yn
+      [[ "${yn}" =~ ^[Yy] ]] && apply=1
+    fi
+    [ "${apply}" = 0 ] && DNS_STATUS="left as is (answer y, or run with DNS_REPLACE=yes, to switch)"
+  else
+    DNS_STATUS="Cloudflare check failed (see above); DNS not changed"
+  fi
+  if [ "${apply}" = 1 ]; then
+    if apply_out="$(cf_dns apply 2>&1)"; then
+      indent "${apply_out}"
+      DNS_STATUS="${DNS_HOSTS[*]} -> ${SERVER_IP}"
+      if [ "$(env_get CF_PROXIED)" != "true" ]; then
+        # Give resolvers a moment so Caddy's first certificate attempt succeeds (it retries anyway).
+        for _ in $(seq 1 20); do
+          [ "$(getent ahostsv4 "${DOMAIN}" 2>/dev/null | awk 'NR==1{print $1}')" = "${SERVER_IP}" ] && break
+          sleep 3
+        done
+      fi
+    else
+      indent "${apply_out}"
+      DNS_STATUS="Cloudflare update failed (see above)"
+    fi
+  fi
+fi
+
 # ── HTTPS through Caddy ────────────────────────────────────────────────────────────────────
 # add_caddy_site <host to look for> <site address line> <extra directives>
 add_caddy_site() {
@@ -333,6 +398,7 @@ else
 fi
 echo "  Client portal: https://${DOMAIN}/portal"
 echo "  Database:     ${DB_NAME} on ${PG_CONTAINER} (network ${DB_NETWORK})"
+echo "  DNS:          ${DNS_STATUS}"
 echo "  HTTPS:        ${CADDY_STATUS}"
 [ -n "${backup:-}" ] && echo "  Backup:       ${backup#"${APP_DIR}"/}"
 if [ "${#SKIPPED[@]}" -gt 0 ]; then
@@ -340,6 +406,7 @@ if [ "${#SKIPPED[@]}" -gt 0 ]; then
   warn "Skipped (add to .env and run this script again to enable):"
   for k in "${SKIPPED[@]}"; do
     case "$k" in
+      CLOUDFLARE_API_TOKEN) why="DNS not managed: point the A records at ${SERVER_IP:-this server} yourself" ;;
       SMTP_*) why="no emails: lead alerts, client invites and review requests are logged instead (invite links still show in /admin)" ;;
       *)      why="" ;;
     esac
@@ -347,5 +414,6 @@ if [ "${#SKIPPED[@]}" -gt 0 ]; then
   done
 fi
 echo
-echo "  DNS: point ${DOMAIN}, www.${DOMAIN} and ${BOOKING_DOMAIN} (A records) at this server."
+echo "  Moving from Vercel? Once the sites load from here, remove ${DOMAIN} and ${BOOKING_DOMAIN} from the Vercel project."
+[ "$(env_get CF_PROXIED)" = "true" ] && echo "  Cloudflare proxy is on: set SSL/TLS mode to Full (strict) for ${DOMAIN}."
 echo "  After schema changes in a new commit, run this script again (it backs up, then migrates)."

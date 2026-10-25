@@ -19,9 +19,13 @@ cd /opt/deploy/applications/portfolio
 bash scripts/setup.sh
 ```
 
-`setup.sh` generates secrets, creates the database in the shared PostgreSQL (or starts a private one), asks for the admin email and SMTP once, backs up, migrates, builds, starts, health-checks, and adds both domains to Caddy. Run it again any time to redeploy — and always after a commit that changes `prisma/schema.prisma`.
+`setup.sh` generates secrets, creates the database in the shared PostgreSQL (or starts a private one), asks for the admin email and SMTP once, backs up, migrates, builds, starts, health-checks, and points the domains at this server in Cloudflare DNS, and adds both domains to Caddy. Run it again any time to redeploy — and always after a commit that changes `prisma/schema.prisma`.
 
 Pushes to `main` deploy automatically through `.github/workflows/deploy.yml` (the shared `infrastructure` reusable workflow: exact-SHA build, health check, automatic rollback).
+
+### DNS
+
+Give `setup.sh` a Cloudflare API token (My Profile → API Tokens → *Edit zone DNS*, zone `michaelmusyoka.com`) when it asks, or pass `CLOUDFLARE_API_TOKEN=...`. It sets `michaelmusyoka.com`, `www` and `booking` to A records for this server (`scripts/cloudflare_dns.py`). If the records point elsewhere (e.g. Vercel) it lists them and asks before replacing; for non-interactive runs, pass `DNS_REPLACE=yes`. Other records (MX, TXT, `fx`, …) are not touched. Skip the token to manage DNS by hand. Once the sites load from the VPS, remove the domains from the Vercel project.
 
 ## How things flow
 

@@ -41,3 +41,4 @@ next-env.d.ts
 backups/
 .deployed_sha
 .previous_sha
+__pycache__/
